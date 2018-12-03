@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get('/', (req, res, next) => {
 
-    User.findOne()
+    User.find()
       .sort('asc')
       .then(results => {
         res.json(results);
@@ -22,8 +22,8 @@ router.post('/', (req, res, next) => {
     const { fullName, userName, password } = req.body
     const newUser = { fullName, userName, password };
     return User.create(newUser)
-    .then (res => {
-        res.location(`http://${req.headers.host}/users/${res.userName}`).status(201).json(res)
+    .then (results => {
+        results.location(`http://${req.headers.host}/users/${results.userName}`).status(201).json(results)
     }) 
     .catch(err => {
         if (err.code === 11000) {
