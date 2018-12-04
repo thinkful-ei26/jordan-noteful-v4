@@ -18,7 +18,8 @@ router.get('/', (req, res, next) => {
   });
 
 router.post('/', (req, res, next) => {
-    const { fullname, username, password } = req.body
+    const { fullname, username, password } = req.body;
+   
     const requiredFields = ['username', 'password'];
     const missingField = requiredFields.find(field => !(field in req.body));
 
@@ -28,7 +29,13 @@ router.post('/', (req, res, next) => {
       return next(err);
     }
 
-    const stringFields = ['username', 'password', 'fullName'];
+    if (!requiredFields) {
+        const err = new Error(`'${requiredFields}' missing in request body`);
+        err.status = 422;
+        return next(err);
+      }
+
+    const stringFields = ['username', 'password', 'fullname'];
     const nonStringField = stringFields.find(
         field => field in req.body && typeof req.body[field] !== 'string');
 
@@ -50,7 +57,7 @@ router.post('/', (req, res, next) => {
             reason: 'ValidationError',
             message: 'Cannot start or end with whitespace',
             location: nonTrimmedField
-        })
+        });
       }
 
     const sizedFields = {
@@ -87,12 +94,14 @@ router.post('/', (req, res, next) => {
                 fullname
     };
     console.log(newUser);
-    return User.create(newUser);
+    return User.create(newUser)
   })
   .then(result => {
-    return res.status(201).location(`/api/users/${result.id}`).json(result.serialize());
+    return res.status(201).location(`/api/users/${result.id}`).json(result);
   })
   .catch(err => {
+      console.log(err)
+      console.log(err.hello + err.body.message)
     if (err.code === 11000) {
       err = new Error('The username already exists');
       err.status = 400;
