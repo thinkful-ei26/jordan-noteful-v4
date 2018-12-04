@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const localStrategy = require('./passport/local');
 
-const { PORT, MONGODB_URI } = require('./config');
+const { PORT, MONGODB_URI, JWT_SECRET, JWT_EXPIRY } = require('./config');
 
 const notesRouter = require('./routes/notes');
 const foldersRouter = require('./routes/folders');
