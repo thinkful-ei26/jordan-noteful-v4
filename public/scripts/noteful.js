@@ -389,6 +389,8 @@ const noteful = (function () {
     $('.js-login-form').on('submit', event => {
       event.preventDefault();
 
+
+
       const loginForm = $(event.currentTarget);
       const loginUser = {
         username: loginForm.find('.js-username-entry').val(),
@@ -397,6 +399,7 @@ const noteful = (function () {
 
       api.create('/api/login', loginUser)
         .then(response => {
+          store.authToken = response.authToken;
           store.currentUser = response;
           store.authorized = true;
           loginForm[0].reset();
