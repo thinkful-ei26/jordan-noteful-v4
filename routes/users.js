@@ -2,6 +2,7 @@
 
 const express = require('express');
 const User = require('../models/user');
+const passport = require('passport');
 
 const router = express.Router();
 
@@ -115,5 +116,6 @@ router.delete('/:id', function (req,res,next)
     return User.findByIdAndDelete(id) 
     .then(() => res.sendStatus(204)); 
 });
- 
+
+
 module.exports = router;

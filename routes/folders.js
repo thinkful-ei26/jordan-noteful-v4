@@ -2,6 +2,7 @@
 
 const express = require('express');
 const mongoose = require('mongoose');
+const passport = require('passport');
 
 const Folder = require('../models/folder');
 const Note = require('../models/note');
@@ -20,6 +21,8 @@ router.get('/', (req, res, next) => {
       next(err);
     });
 });
+
+router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', (req, res, next) => {
@@ -137,5 +140,6 @@ router.delete('/:id', (req, res, next) => {
       next(err);
     });
 });
+
 
 module.exports = router;
