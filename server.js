@@ -35,6 +35,15 @@ app.use(express.json());
 passport.use(localStrategy);
 passport.use(jwtStrategy);
 
+app.use((req, res, next) => {
+  if (req.headers.authorization) {
+    next();
+  }
+    else {
+      next({ status:401 });
+    }
+});
+
 // Mount routers
 app.use('/api/notes', notesRouter);
 app.use('/api/folders', foldersRouter);

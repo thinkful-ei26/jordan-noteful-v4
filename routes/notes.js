@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 
 const Note = require('../models/note');
-const User = require('../models/user');
+// const User = require('../models/user');
 
 const router = express.Router();
 
@@ -116,12 +116,10 @@ router.post('/', (req, res, next) => {
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
   const { id } = req.params;
-  const userId = req.User.id;
+  const currentUser = req.user.id;
 
   const toUpdate = {};
   const updateableFields = ['title', 'content', 'folderId', 'tags'];
-
-  if (userId)
 
   updateableFields.forEach(field => {
     if (field in req.body) {
@@ -130,13 +128,14 @@ router.put('/:id', (req, res, next) => {
   });
 
   /***** Never trust users - validate input *****/
+
   if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `note id` is not valid');
     err.status = 400;
     return next(err);
   }
 
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
+  if (!mongoose.Types.ObjectId.isValid(currentUser)) {
     const err = new Error('The `user id` is not valid');
     err.status = 400;
     return next(err);
@@ -168,7 +167,7 @@ router.put('/:id', (req, res, next) => {
     toUpdate.$unset = {folderId : 1};
   }
 
-  Note.findByIdAndUpdate(id, toUpdate, { new: true })
+  Note.findOneAndUpdate({_id: id, userId: currentUser}, toUpdate, { new: true })
     .then(result => {
       if (result) {
         res.json(result);
