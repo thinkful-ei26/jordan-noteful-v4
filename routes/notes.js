@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 
 const Note = require('../models/note');
-// const User = require('../models/user');
 
 const router = express.Router();
 
@@ -167,7 +166,7 @@ router.put('/:id', (req, res, next) => {
     toUpdate.$unset = {folderId : 1};
   }
 
-  Note.findOneAndUpdate({_id: id, userId: currentUser}, toUpdate, { new: true })
+  Note.findOneAndUpdate({ _id: id, userId: currentUser }, toUpdate, { new: true })
     .then(result => {
       if (result) {
         res.json(result);
@@ -183,6 +182,7 @@ router.put('/:id', (req, res, next) => {
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
+  const currentUser = req.user.id;
 
   /***** Never trust users - validate input *****/
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -191,9 +191,9 @@ router.delete('/:id', (req, res, next) => {
     return next(err);
   }
 
-  Note.findByIdAndRemove(id)
+  Note.findOneAndDelete({ _id: id, userId: currentUser })
     .then(() => {
-      res.sendStatus(204);
+      res.sendStatus('bye bye, birdy', 204);
     })
     .catch(err => {
       next(err);
