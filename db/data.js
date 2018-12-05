@@ -154,6 +154,7 @@ const users = [
     password: '$2a$10$QJCIX42iD5QMxLRgHHBJre2rH6c6nI24UysmSYtkmeFv6X8uS1kgi'
   },
   {
+    //JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImZ1bGxuYW1lIjoiTXIgWWVsbG93IiwidXNlcm5hbWUiOiJtcnllbGxvdyIsImlkIjoiMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAyIn0sImlhdCI6MTU0NDAzOTYwMSwiZXhwIjoxNTQ0NjQ0NDAxLCJzdWIiOiJtcnllbGxvdyJ9.iNN2GCeTWa_2nrZq420LUKcu2Jp5JquaQhxvbW_bj18
     _id: '000000000000000000000002',
     fullname: 'Mr Yellow',
     username: 'mryellow',
