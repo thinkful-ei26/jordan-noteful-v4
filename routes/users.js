@@ -18,6 +18,19 @@ router.get('/', (req, res, next) => {
       });
   });
 
+  //get user by userId
+router.get('/:id', (req, res, next) => {
+    const id = req.params.id
+
+    User.findById(id)
+      .then(results => {
+        res.json(results);
+      })
+      .catch(err => {
+        next(err);
+      });
+  });
+
 router.post('/', (req, res, next) => {
     const { fullname, username, password } = req.body;
    
