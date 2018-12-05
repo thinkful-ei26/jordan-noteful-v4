@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 
 const Note = require('../models/note');
+const User = require('../models/user');
 
 const router = express.Router();
 
@@ -12,7 +13,8 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
-  const { searchTerm, folderId, tagId, userId } = req.query;
+  const { searchTerm, folderId, tagId } = req.query;
+  const userId = req.user.id;
 
   let filter = {};
 
@@ -30,7 +32,7 @@ router.get('/', (req, res, next) => {
   }
 
   if (userId) {
-    filter.tags = userId;
+    filter.userId = userId;
   }
 
   Note.find(filter)
@@ -73,6 +75,7 @@ router.get('/:id', (req, res, next) => {
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
   const { title, content, folderId, tags } = req.body;
+  const userId = req.user.id;
 
   /***** Never trust users - validate input *****/
   if (!title) {
@@ -96,7 +99,7 @@ router.post('/', (req, res, next) => {
     }
   }
 
-  const newNote = { title, content, folderId, tags };
+  const newNote = { title, content, folderId, tags, userId };
   if (newNote.folderId === '') {
     delete newNote.folderId;
   }
@@ -113,9 +116,12 @@ router.post('/', (req, res, next) => {
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
   const { id } = req.params;
+  const userId = req.User.id;
 
   const toUpdate = {};
   const updateableFields = ['title', 'content', 'folderId', 'tags'];
+
+  if (userId)
 
   updateableFields.forEach(field => {
     if (field in req.body) {
@@ -125,7 +131,13 @@ router.put('/:id', (req, res, next) => {
 
   /***** Never trust users - validate input *****/
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    const err = new Error('The `id` is not valid');
+    const err = new Error('The `note id` is not valid');
+    err.status = 400;
+    return next(err);
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    const err = new Error('The `user id` is not valid');
     err.status = 400;
     return next(err);
   }
