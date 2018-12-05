@@ -94,4 +94,22 @@ const tags = [
   }
 ];
 
-module.exports = { folders, notes, tags };
+const users = [
+  {
+    "username": "newuserjames",
+    "fullname": "james",
+    "password": "$2a$10$.irx/vzxl8sYSPp0cdBtSuRw6vmzDhGWyTRm/2FuJv3GTKQhT7fam"
+},
+{
+    "username": "jojo",
+    "fullname": "Jordan Haddadi",
+    "password": "$2a$10$LsoEZGv8ZhGMYxN2qm7TxO8zwcZjSdAjptB9KNF5jX1r8irHUApRu"
+},
+{
+    "username": "joelizabeth",
+    "fullname": "Jordan Elizabeth",
+    "password": "$2a$10$GAl43..yRlTZDU1LV4/0SexmkF4.Fov2MNxRCVKtgJ8joGgAEeyhq"
+}
+]
+
+module.exports = { folders, notes, tags, users };
