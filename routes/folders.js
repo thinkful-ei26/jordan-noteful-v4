@@ -128,13 +128,10 @@ router.delete('/:id', (req, res, next) => {
     return next(err);
   }
 
-  // ON DELETE SET NULL equivalent
-  const folderRemovePromise = Folder.findOneAndRemove({id: id, userId});
-  // ON DELETE CASCADE equivalent
-  // const noteRemovePromise = Note.deleteMany({ folderId: id });
+  const folderRemovePromise = Folder.findOneAndRemove({ _id: id, userId });
 
   const noteRemovePromise = Note.updateMany(
-    { folderId: id },
+    { folderId: id, userId },
     { $unset: { folderId: '' } }
   );
 

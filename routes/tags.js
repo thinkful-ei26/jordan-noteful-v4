@@ -13,8 +13,10 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
-
-  Tag.find()
+  const { tags } = req.query;
+  const userId = req.user.id;
+  
+  Tag.find({ tags, userId })
     .sort('name')
     .then(results => {
       res.json(results);
@@ -27,6 +29,7 @@ router.get('/', (req, res, next) => {
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', (req, res, next) => {
   const { id } = req.params;
+  const userId = req.query.id;
 
   /***** Never trust users - validate input *****/
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -35,7 +38,7 @@ router.get('/:id', (req, res, next) => {
     return next(err);
   }
 
-  Tag.findById(id)
+  Tag.findById({ _id: id, userId })
     .then(result => {
       if (result) {
         res.json(result);
@@ -51,8 +54,9 @@ router.get('/:id', (req, res, next) => {
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
   const { name } = req.body;
+  const userId = req.user.id;
 
-  const newTag = { name };
+  const newTag = { name, userId }
 
   /***** Never trust users - validate input *****/
   if (!name) {
@@ -67,7 +71,7 @@ router.post('/', (req, res, next) => {
     })
     .catch(err => {
       if (err.code === 11000) {
-        err = new Error('Tag name already exists');
+        err = new Error('Folder name already exists');
         err.status = 400;
       }
       next(err);
@@ -78,7 +82,8 @@ router.post('/', (req, res, next) => {
 router.put('/:id', (req, res, next) => {
   const { id } = req.params;
   const { name } = req.body;
-
+  const userId = req.user.id;
+  const toUpdate = { name } ;
   /***** Never trust users - validate input *****/
   if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid');
@@ -92,9 +97,7 @@ router.put('/:id', (req, res, next) => {
     return next(err);
   }
 
-  const updateTag = { name };
-
-  Tag.findByIdAndUpdate(id, updateTag, { new: true })
+  Tag.findOneAndUpdate({ _id: id, userId: userId }, toUpdate, { new: true })
     .then(result => {
       if (result) {
         res.json(result);
@@ -104,7 +107,7 @@ router.put('/:id', (req, res, next) => {
     })
     .catch(err => {
       if (err.code === 11000) {
-        err = new Error('Tag name already exists');
+        err = new Error('Folder name already exists');
         err.status = 400;
       }
       next(err);
@@ -114,6 +117,7 @@ router.put('/:id', (req, res, next) => {
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
+  const userId = req.query.id;
 
   /***** Never trust users - validate input *****/
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -122,10 +126,10 @@ router.delete('/:id', (req, res, next) => {
     return next(err);
   }
 
-  const tagRemovePromise = Tag.findByIdAndRemove(id);
+  const tagRemovePromise = Tag.findByIdAndRemove({ _id: id, userId });
 
   const noteUpdatePromise = Note.updateMany(
-    { tags: id },
+    { tags: id, userId },
     { $pull: { tags: id } }
   );
 
