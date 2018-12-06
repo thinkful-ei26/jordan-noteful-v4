@@ -176,31 +176,10 @@ router.put('/:id', (req, res, next) => {
     return next(err);
   }
 
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    const err = new Error('The `user id` is not valid');
-    err.status = 400;
-    return next(err);
-  }
-
   if (toUpdate.title === '') {
     const err = new Error('Missing `title` in request body');
     err.status = 400;
     return next(err);
-  }
-
-  if (toUpdate.folderId && !mongoose.Types.ObjectId.isValid(toUpdate.folderId)) {
-    const err = new Error('The `folderId` is not valid');
-    err.status = 400;
-    return next(err);
-  }
-
-  if (toUpdate.tags) {
-    const badIds = toUpdate.tags.filter((tag) => !mongoose.Types.ObjectId.isValid(tag));
-    if (badIds.length) {
-      const err = new Error('The `tags` array contains an invalid `id`');
-      err.status = 400;
-      return next(err);
-    }
   }
 
   if (toUpdate.folderId === '') {
@@ -208,7 +187,14 @@ router.put('/:id', (req, res, next) => {
     toUpdate.$unset = {folderId : 1};
   }
 
-  Note.findOneAndUpdate({ _id: id, userId: userId }, toUpdate, { new: true })
+  Promise.all([
+    validateFolderId(toUpdate.folderId, userId),
+    validateTagIds(toUpdate.tags, userId)
+  ])
+    .then(() => {
+      return Note.findByIdAndUpdate(id, toUpdate, { new: true })
+        .populate('tags');
+    })
     .then(result => {
       if (result) {
         res.json(result);
