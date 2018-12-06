@@ -2,7 +2,7 @@
 
 const express = require('express');
 const User = require('../models/user');
-const passport = require('passport');
+// const passport = require('passport');
 
 const router = express.Router();
 
@@ -114,11 +114,11 @@ router.post('/', (req, res, next) => {
     return res.status(201).location(`/api/users/${result.id}`).json(result);
   })
   .catch(err => {
-      console.log(err)
-      console.log(err.hello + err.body.message)
+    //   console.log(err)
+    //   console.log(err.hello + err.body.message)
     if (err.code === 11000) {
       err = new Error('The username already exists');
-      err.status = 400;
+      err.status = 422;
     }
     next(err);
   });
