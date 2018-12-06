@@ -12,13 +12,12 @@ const router = express.Router();
 
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
-
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
-const id = req.query.id;
 const currentUser = req.user.id;
 
-  Folder.find({ _id: id, userId: currentUser })
+  Folder.find({ currentUser })
+    // .populate('users')
     .sort('name')
     .then(results => {
       res.json(results);
@@ -40,7 +39,7 @@ router.get('/:id', (req, res, next) => {
     return next(err);
   }
 
-  Folder.findById({ _id: id, userId: currentUser })
+  Folder.findOne({ _id: id, userId: currentUser })
     .then(result => {
       if (result) {
         res.json(result);
@@ -58,7 +57,7 @@ router.post('/', (req, res, next) => {
   const { name } = req.body;
   const currentUser = req.user.id;
 
-  const newFolder = { name, currentUser };
+  const newFolder = { name, currentUser }
 
   /***** Never trust users - validate input *****/
   if (!name) {
@@ -138,10 +137,10 @@ router.delete('/:id', (req, res, next) => {
     { $unset: { folderId: '' } }
   );
 
-  const userRemovePromise = User.updateMany(
-    { userId: currentUser },
-    { $unset: { userId: '' } }
-  )
+  // const userRemovePromise = User.updateMany(
+  //   { userId: currentUser },
+  //   { $unset: { userId: '' } }
+  // )
 
   Promise.all([folderRemovePromise, noteRemovePromise, userRemovePromise])
     .then(() => {

@@ -13,7 +13,7 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
   const { searchTerm, folderId, tagId } = req.query;
-  const userId = req.user.id;
+  const currentUser = req.user.id;
 
   let filter = {};
 
@@ -30,8 +30,8 @@ router.get('/', (req, res, next) => {
     filter.tags = tagId;
   }
 
-  if (userId) {
-    filter.userId = userId;
+  if (currentUser) {
+    filter.userId = currentUser;
   }
 
   Note.find(filter)
@@ -193,7 +193,7 @@ router.delete('/:id', (req, res, next) => {
 
   Note.findOneAndDelete({ _id: id, userId: currentUser })
     .then(() => {
-      res.sendStatus('bye bye, birdy', 204);
+      res.sendStatus(204);
     })
     .catch(err => {
       next(err);
