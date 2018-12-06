@@ -13,7 +13,7 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
   const { searchTerm, folderId, tagId } = req.query;
-  const currentUser = req.user.id;
+  const userId = req.user.id;
 
   let filter = {};
 
@@ -30,8 +30,8 @@ router.get('/', (req, res, next) => {
     filter.tags = tagId;
   }
 
-  if (currentUser) {
-    filter.userId = currentUser;
+  if (userId) {
+    filter.userId = userId;
   }
 
   Note.find(filter)
@@ -115,7 +115,7 @@ router.post('/', (req, res, next) => {
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
   const { id } = req.params;
-  const currentUser = req.user.id;
+  const userId = req.user.id;
 
   const toUpdate = {};
   const updateableFields = ['title', 'content', 'folderId', 'tags'];
@@ -134,7 +134,7 @@ router.put('/:id', (req, res, next) => {
     return next(err);
   }
 
-  if (!mongoose.Types.ObjectId.isValid(currentUser)) {
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
     const err = new Error('The `user id` is not valid');
     err.status = 400;
     return next(err);
@@ -166,7 +166,7 @@ router.put('/:id', (req, res, next) => {
     toUpdate.$unset = {folderId : 1};
   }
 
-  Note.findOneAndUpdate({ _id: id, userId: currentUser }, toUpdate, { new: true })
+  Note.findOneAndUpdate({ _id: id, userId: userId }, toUpdate, { new: true })
     .then(result => {
       if (result) {
         res.json(result);
@@ -182,7 +182,7 @@ router.put('/:id', (req, res, next) => {
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
-  const currentUser = req.user.id;
+  const userId = req.user.id;
 
   /***** Never trust users - validate input *****/
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -191,7 +191,7 @@ router.delete('/:id', (req, res, next) => {
     return next(err);
   }
 
-  Note.findOneAndDelete({ _id: id, userId: currentUser })
+  Note.findOneAndDelete({ _id: id, userId: userId })
     .then(() => {
       res.sendStatus(204);
     })
