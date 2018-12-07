@@ -13,9 +13,10 @@ schema.index({ name: 1, userId: 1 }, { unique: true });
 schema.set('timestamps', true);
 
 // Transform output during `res.json(data)`, `console.log(data)` etc.
-schema.set('toObject', {
+schema.set('toJSON', {
   virtuals: true,
   transform: (doc, result) => {
+    // console.log('*******im running*******')
     delete result._id;
     delete result.__v;
   }

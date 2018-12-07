@@ -63,7 +63,7 @@ router.post('/', (req, res, next) => {
     }
 
     const trimmedFields = ['username', 'password']
-    const nonTrimmedField = trimmedFields.find(field => req.body[field].trim() !== req.body[field]);
+    const nonTrimmedField = trimmedFields.find(field => req.body[field].trim('') !== req.body[field]);
 
     if (nonTrimmedField) {
         return res.status(422).json({
