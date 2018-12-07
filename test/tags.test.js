@@ -19,7 +19,7 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 const sandbox = sinon.createSandbox();
 
-describe.only('Noteful API - Tags', function () {
+describe('Noteful API - Tags', function () {
 
   let user;
   let token;
